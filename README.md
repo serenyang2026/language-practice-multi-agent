@@ -1,20 +1,41 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# langagent – Language Practice Multi-Agent
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+A small multi-agent app for practising a foreign language. A **supervisor** reads each message and routes it to one of four specialists:
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+| Agent | Handles |
+|---|---|
+| `writing_corrector` | Your own text (e.g. a diary entry) to correct |
+| `vocab` | "What does X mean?" / "How do I say Y?" |
+| `grammar_teacher` | Explaining a grammar topic |
+| `quiz` | Creating a quiz, and grading your answers |
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+Built with LangGraph and Streamlit. Deployed to Azure Container Apps (dev / test / prod) via Azure Pipelines.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## Project structure
+
+```
+agent.py           # graph: supervisor + 4 specialists, model setup
+app.py             # Streamlit chat UI
+requirements.txt   # Python dependencies
+.env.example       # configuration template (copy to .env, never commit .env)
+```
+
+## Run locally
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env        # then fill in the values
+streamlit run app.py
+```
+
+## Configuration
+
+All settings come from environment variables (see `.env.example`):
+
+| Variable | Purpose |
+|---|---|
+| `LLM_PROVIDER` | `azure` (target) or `anthropic` (temporary local testing) |
+| `AZURE_OPENAI_ENDPOINT` / `AZURE_OPENAI_DEPLOYMENT` / `AZURE_OPENAI_API_VERSION` | Azure OpenAI model. Auth via Entra ID, no API key |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Only when `LLM_PROVIDER=anthropic` |

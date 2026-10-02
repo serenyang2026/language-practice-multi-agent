@@ -1,0 +1,7 @@
+langgraph
+langchain
+langchain-openai
+langchain-anthropic
+azure-identity
+streamlit
+python-dotenv
