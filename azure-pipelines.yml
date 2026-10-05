@@ -1,0 +1,51 @@
+trigger:
+  branches:
+    include:
+      - main
+
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  acrName: acrserenyanglab
+  imageRepo: langagent
+  imageTag: $(Build.BuildId) 
+  devResourceGroup: rg-langagent-dev
+  devContainerApp: ca-langagent-dev
+
+stages:
+
+- stage: Build
+  jobs:
+  - job: BuildAndPush
+    steps:
+    - task: AzureCLI@2
+      displayName: Build and push image to ACR
+      inputs:
+        azureSubscription: sc-langagent-dev
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az acr login -n $(acrName)
+          docker build -t $(acrName).azurecr.io/$(imageRepo):$(imageTag) .
+          docker push $(acrName).azurecr.io/$(imageRepo):$(imageTag)
+
+- stage: DeployDev
+  dependsOn: Build
+  jobs:
+  - deployment: DeployToDev
+    environment: dev                 
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: Update Container App image
+            inputs:
+              azureSubscription: sc-langagent-dev
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set extension.use_dynamic_install=yes_without_prompt
+                az containerapp update -n $(devContainerApp) -g $(devResourceGroup) --image $(acrName).azurecr.io/$(imageRepo):$(imageTag)
