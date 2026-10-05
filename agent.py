@@ -20,7 +20,7 @@ from pydantic import BaseModel
 logger = logging.getLogger(__name__)
 
 # Options shown in the UI. The first entry of each list is the default.
-LANGUAGES = ["German", "French", "Spanish", "Italian", "Japanese", "Korean", "English"]
+LANGUAGES = ["Chinese","German", "French", "Spanish", "Italian", "Japanese", "Korean", "English"]
 EXPLAIN_IN = ["English", "Chinese", "German"]
 LEVELS = ["intermediate", "beginner", "advanced"]
 
